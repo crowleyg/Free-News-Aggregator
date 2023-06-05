@@ -12,8 +12,11 @@ import time
 
 def news_scrape(keyword):
     pass
+
 def npr_search(keyword):
-    """Searches NPR for articles with the given keyword. Returns a list of dictionaries with article title, article url, article date, article source, article text. """
+    """Searches NPR for articles with the given keyword. 
+       Returns a list of dictionaries with article title, article url,
+       article date, article source, article text. """
     
     url = 'https://www.npr.org/search/?query=' + keyword
     browser = webdriver.Chrome()
@@ -36,6 +39,51 @@ def npr_search(keyword):
         article_list.append(article_dict)
     return article_list
 
+def usatoday_search(keyword):
+    """Searches USA Today for articles with the given keyword. 
+       Returns a list of dictionaries with article title, article url, 
+       article date, article source, article text. """
+    
+    url = 'https://www.usatoday.com/search/?q=' + keyword
+    r = requests.get(url)
+    soup = BeautifulSoup(r.text, 'html5lib')
+    content = soup.find('div', attrs = {'class': 'gnt_pr'})
+    articles = content.find_all('a', attrs = {'class': 'gnt_se_a'})
+    
+    article_list = []
+    for article in articles:
+        a_attributes = article.attrs
+        div = article.find('div', attrs = {'class': 'gnt_se_th_by'})
+        div_attributes = div.attrs
+        substring = div.text
+        article_dict = {}
+        
+        article_dict['title'] = article.text.replace(substring, '')  #removes substring from title
+        article_dict['url'] = 'https://www.usatoday.com' + a_attributes['href']
+        try:
+            article_dict['date'] = div_attributes['data-c-dt']
+        except:
+            article_dict['date'] = 'N/A'
+        article_dict['source'] = 'USA Today'
+        article_dict['text'] = a_attributes['data-c-desc']
+        article_list.append(article_dict)
+    return article_list
+
+def newsweek_search(keyword):
+    pass
+
+def reuters_search(keyword):
+    pass
+
+def thehill_search(keyword):
+    pass
+
+def time_search(keyword):
+    pass
+
+def bbc_search(keyword):
+    pass
+    
 if __name__ == '__main__':
-    print(npr_search('president'))
+    print(usatoday_search('president'))
     
