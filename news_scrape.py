@@ -129,11 +129,32 @@ def thehill_search(keyword):
     return article_list
 
 def time_search(keyword):
-    pass
+    """Searches Time for articles with the given keyword. 
+       Returns a list of dictionaries with article title, article url, 
+       article date, article source, article text. """
+        
+    url = 'https://time.com/search/?q=' + keyword
+    r = requests.get(url)
+    soup = BeautifulSoup(r.text, 'html5lib')
+    content = soup.find('div', attrs = {'class': 'margin-16-bottom'})
+    articles = content.find_all('article')
+    
+    article_list = []
+    for article in articles:
+        article_dict = {}
+        title = article.text.replace('\n', '')
+        title = title.replace(' | Time', '')
+        article_dict['title'] = title.strip()
+        article_dict['url'] = article.find('a')['href']
+        article_dict['date'] = None
+        article_dict['source'] = 'Time'
+        article_dict['text'] = None
+        article_list.append(article_dict)
+    return article_list
 
 def bbc_search(keyword):
     pass
     
 if __name__ == '__main__':
-    print(thehill_search('president'))
+    print(time_search('president'))
     
