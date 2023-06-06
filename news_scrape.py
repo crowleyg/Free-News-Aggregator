@@ -81,9 +81,7 @@ def reuters_search(keyword):
     html = browser.page_source
     r = requests.get(url)
     soup = BeautifulSoup(html, 'html5lib')
-    #print(soup.prettify())
     content = soup.find('div', attrs = {'class': 'search-results__sectionContainer__34n_c'})
-    print(content.prettify())
     articles = content.find_all('li', attrs = {'class': 'search-results__item__2oqiX'})
 
     article_list = []
@@ -99,7 +97,36 @@ def reuters_search(keyword):
     return article_list
 
 def thehill_search(keyword):
-    pass
+    """Searches The Hill for articles with the given keyword. 
+       Returns a list of dictionaries with article title, article url, 
+       article date, article source, article text. """
+        
+    url = 'https://thehill.com/?s=' + keyword + '&submit=Search'
+    r = requests.get(url)
+    soup = BeautifulSoup(r.text, 'html5lib')
+    content = soup.find('div', attrs = {'class': 'search__results'})
+    #print(content.prettify())
+    articles = content.find_all('article', attrs = {'class': 'featured-cards__full'})
+    
+    article_list = []
+    for article in articles:
+        article_data = article.find('h1', attrs = {'class': 'featured-cards__full__headline'}).find('a')
+        a_attributes = article_data.attrs
+        article_dict = {}
+        title = article_data.text
+        title = title.replace('\n', '')
+        title = title.replace('\t', '')
+        date = article.find('span', attrs = {'class': 'color-light-gray'}).text
+        date = date.replace('\n', '')
+        date = date.replace('\t', '')
+        article_dict['title'] = title
+        article_dict['url'] = a_attributes['href']
+        article_dict['date'] = date
+        article_dict['source'] = 'The Hill'
+        article_dict['text'] = None
+        article_list.append(article_dict)
+    del article_list[0]
+    return article_list
 
 def time_search(keyword):
     pass
@@ -108,5 +135,5 @@ def bbc_search(keyword):
     pass
     
 if __name__ == '__main__':
-    print(reuters_search('president'))
+    print(thehill_search('president'))
     
