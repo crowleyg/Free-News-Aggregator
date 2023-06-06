@@ -6,7 +6,7 @@ import datetime
 import time
 
 #news_scrape scrapes trusted, free news websites for articles given a keyword string. Results are returned in a json file.
-#websites searched: npr.org, usatoday.com, newsweek.com, reuters.com, thehill.com, time.com, bbc.com
+#websites searched: npr.org, usatoday.com, reuters.com, thehill.com, time.com, bbc.com
 #Input: keyword string
 #Output: json file with article title, article url, article date, article source, article text. Grouped by website. 
 
@@ -69,11 +69,34 @@ def usatoday_search(keyword):
         article_list.append(article_dict)
     return article_list
 
-def newsweek_search(keyword):
-    pass
-
 def reuters_search(keyword):
-    pass
+    """Searches Reuters for articles with the given keyword. 
+       Returns a list of dictionaries with article title, article url, 
+       article date, article source, article text. """
+       
+    url = 'https://www.reuters.com/site-search/?query=' + keyword
+    browser = webdriver.Chrome()
+    browser.get(url)
+    time.sleep(2)
+    html = browser.page_source
+    r = requests.get(url)
+    soup = BeautifulSoup(html, 'html5lib')
+    #print(soup.prettify())
+    content = soup.find('div', attrs = {'class': 'search-results__sectionContainer__34n_c'})
+    print(content.prettify())
+    articles = content.find_all('li', attrs = {'class': 'search-results__item__2oqiX'})
+
+    article_list = []
+    for article in articles:
+        article_dict = {}
+        a_attributes = article.find('a').attrs
+        article_dict['title'] = article.find('a').text
+        article_dict['url'] = 'https://www.reuters.com' + a_attributes['href']
+        article_dict['date'] = article.find('time').text
+        article_dict['source'] = 'Reuters'
+        article_dict['text'] = None
+        article_list.append(article_dict)
+    return article_list
 
 def thehill_search(keyword):
     pass
@@ -85,5 +108,5 @@ def bbc_search(keyword):
     pass
     
 if __name__ == '__main__':
-    print(usatoday_search('president'))
+    print(reuters_search('president'))
     
