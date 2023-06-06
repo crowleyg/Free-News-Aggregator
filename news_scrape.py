@@ -153,8 +153,27 @@ def time_search(keyword):
     return article_list
 
 def bbc_search(keyword):
-    pass
+    """Searches BBC for articles with the given keyword. 
+       Returns a list of dictionaries with article title, article url, 
+       article date, article source, article text. """
+       
+    url = 'https://www.bbc.co.uk/search?q=' + keyword + '&d=HOMEPAGE_GNL'
+    r = requests.get(url)
+    soup = BeautifulSoup(r.text, 'html5lib')
+    content = soup.find('div', attrs = {'class': 'enjd40x0'})
+    articles = content.find_all('div', attrs={'class': 'ett16tt0'})
+    
+    article_list = []
+    for article in articles:
+        article_dict = {}
+        article_dict['title'] = article.find('p', attrs = {'class': 'e1f5wbog5'}).text
+        article_dict['url'] = article.find('a', attrs = {'class': 'e1f5wbog1'})['href']
+        article_dict['date'] = article.find('span', attrs = {'class': 'ecn1o5v3'}).text
+        article_dict['source'] = 'BBC'
+        article_dict['text'] = article.find('p', attrs = {'class': 'eq5iqo00'}).text
+        article_list.append(article_dict)
+    return article_list
     
 if __name__ == '__main__':
-    print(time_search('president'))
+    print(bbc_search('president'))
     
