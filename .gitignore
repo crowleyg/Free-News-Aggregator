@@ -4,3 +4,4 @@
 # Ignore all logfiles and tempfiles.
 *.log
 *.tmp
+*.json
